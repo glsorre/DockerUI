@@ -1,0 +1,39 @@
+[build-system]
+requires = ["briefcase"]
+
+[tool.briefcase]
+project_name = "DockerUI"
+bundle = "com.example"
+version = "0.0.1"
+url = "https://example.com/dockerui"
+license = "MIT license"
+author = 'Giuseppe Sorrentino'
+author_email = "uhpnou@gmail.com"
+
+[tool.briefcase.app.dockerui]
+formal_name = "DockerUI"
+description = "A blazing fast multiplatform docker client"
+icon = "src/dockerui/resources/dockerui"
+sources = ['src/dockerui']
+requires = [
+    'wxpython',
+    'docker',
+    'rx'
+]
+
+
+[tool.briefcase.app.dockerui.macOS]
+requires = []
+
+[tool.briefcase.app.dockerui.linux]
+requires = []
+
+[tool.briefcase.app.dockerui.windows]
+requires = []
+
+# Mobile deployments
+[tool.briefcase.app.dockerui.iOS]
+requires = []
+
+[tool.briefcase.app.dockerui.android]
+requires = []

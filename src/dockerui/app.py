@@ -204,6 +204,3 @@ def main():
     frame.Bind(wx.EVT_CLOSE, lambda e: (scheduler.cancel_all(), e.Skip()))
     scheduler.schedule_periodic(10, frame.UpdateContainers)
     app.MainLoop()
-
-if __name__ == '__main__':
-    main()

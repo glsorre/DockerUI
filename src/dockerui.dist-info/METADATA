@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: dockerui
+Formal-Name: DockerUI
+App-ID: com.example.dockerui
+Version: 0.0.1
+Home-page: https://example.com/dockerui
+Author: Giuseppe Sorrentino
+Author-email: uhpnou@gmail.com
+Summary: A blazing fast multiplatform docker client
