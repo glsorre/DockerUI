@@ -143,22 +143,26 @@ class Frame(wx.Frame):
         super(Frame, self).__init__(None)
         self.SetTitle("DockerUI")
         self.SetSize(600, 600)
-
+        self.SetBackgroundColour("Dark Gray")
+        
         self.containers = Subject()
 
         self.panel = Panel(self)
 
         ctrl_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        text_ctrl = wx.TextCtrl(self)
-        text_ctrl.SetHint("Search...")
-        self.Bind(wx.EVT_TEXT, self.FilterContainers, text_ctrl)
+        self.text_ctrl = wx.TextCtrl(self)
+        self.text_ctrl.SetHint("Search...")
+        self.text_ctrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
+        self.Bind(wx.EVT_TEXT, self.FilterContainers, self.text_ctrl)
 
         update_btn = wx.Button(self, wx.ID_REFRESH)
-        update_btn.Bind(wx.EVT_BUTTON, self.UpdateContainers)
+        update_btn.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNHIGHLIGHT))
+        update_btn.SetDefault()
+        update_btn.Bind(wx.EVT_BUTTON, self.FilterContainers)
 
-        ctrl_sizer.Add(text_ctrl, wx.ALL, wx.ALL, border=10)
-        ctrl_sizer.Add(update_btn, 1, wx.ALL, border=10)  
+        ctrl_sizer.Add(self.text_ctrl, wx.ALL, wx.ALL, border=10)
+        ctrl_sizer.Add(update_btn, 1, wx.ALL, border=10) 
 
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)        
         self.main_sizer.Add(ctrl_sizer, 0, wx.ALL, border=10)
@@ -172,12 +176,14 @@ class Frame(wx.Frame):
             event.Skip()
 
     def FilterContainers(self, event):
-        event.Skip()
-        if event.GetEventObject().GetValue():
-            result = list(filter(lambda c: c.name.startswith(event.GetEventObject().GetValue()), client.containers.list(True)))
+        if event:
+            event.Skip()
+
+        text = self.text_ctrl.GetValue()
+        if text:
+            result = list(filter(lambda c: c.name.startswith(text), client.containers.list(True)))
             self.containers.on_next(result)
         else:
-            print("ci siamo")
             self.containers.on_next(client.containers.list(True))
 
 def main():
@@ -202,5 +208,5 @@ def main():
     frame.UpdateContainers(FAKE_EVENT)
 
     frame.Bind(wx.EVT_CLOSE, lambda e: (scheduler.cancel_all(), e.Skip()))
-    scheduler.schedule_periodic(10, frame.UpdateContainers)
+    scheduler.schedule_periodic(10, frame.FilterContainers)
     app.MainLoop()
