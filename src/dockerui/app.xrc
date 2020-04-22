@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxFrame" name="mainFrame">
+    <title>Test Frame</title>
+    <size>600,600</size>
+    <object class="wxScrolledWindow" name="mainWindow">
+
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <object class="wxPanel" name="containersPanel">
+            </object>
+          </object>
+        </object>
+
+    </object>
+  </object>
+</resource>
