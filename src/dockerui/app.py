@@ -1,5 +1,7 @@
 from src.dockerui.container import Container
 
+import time
+
 import docker
 import rx
 
@@ -16,24 +18,43 @@ RSRC_FRAMENAME = "mainFrame"
 client = docker.from_env()
 
 class DockerUI(wx.App):
+    view_list = False
+
     def OnInit(self):
         self.res = wx.xrc.XmlResource.Get()
         self.res.LoadFile(RSRC_FILE)
         self.containers = Subject()
+        self.images = Subject()
         self.render()
         self.toolbar()
+        self.menu()
         return True
     
-    def render(self, is_list=False):
+    def render(self):
         self.frame = self.res.LoadFrame(None, RSRC_FRAMENAME)
         self.SetTopWindow(self.frame)
-        self.window = wx.xrc.XRCCTRL(self.frame, "mainWindow")
+        self.frame.SetMinSize((400, 200))
+        self.frame.SetSize((600, 600))
+        self.frame.Centre(wx.BOTH)
+        self.notebook = wx.xrc.XRCCTRL(self.frame, "mainNotebook")
+        self.window = wx.xrc.XRCCTRL(self.frame, "containersWindow")
         self.panel = wx.xrc.XRCCTRL(self.frame, "containersPanel")
-        self.panel.grid_sizer = wx.WrapSizer()
-        self.window.SetScrollRate(1,1)
+        self.page = wx.xrc.XRCCTRL(self.frame, "containersPage")
+        self.panel.wrap_sizer = wx.WrapSizer()
+        self.window.SetScrollRate(5,5)
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
         self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
         self.frame.Show()
+
+    def menu(self):
+        menu_bar  = wx.MenuBar()
+        help_menu = wx.Menu()
+
+        help_menu.Append(wx.ID_ABOUT, "&About")
+        menu_bar.Append(help_menu, "&Help")
+
+        self.frame.SetMenuBar(menu_bar)
+        #self.Bind(wx.EVT_MENU, self.on_about_request, id=wx.ID_ABOUT)
 
     def toolbar(self):
         self.toolbar = wx.ToolBar(self.frame)
@@ -56,42 +77,41 @@ class DockerUI(wx.App):
         self.toolbar.Realize()
 
     def update(self):
-        self.panel.SetSizer(self.panel.grid_sizer)
+        self.panel.SetSizer(self.panel.wrap_sizer)
         self.frame.SendSizeEvent()
 
     def on_size(self, event):
-        size = self.frame.GetSize()
-        vsize = self.frame.GetVirtualSize()
-        self.panel.SetSizer(self.panel.grid_sizer)
-        self.panel.SetVirtualSize((size[0], vsize[1]))
-        self.window.SetVirtualSize((size[0], vsize[1]))
-        self.panel.Layout()
-        self.window.Layout()
+        #size = self.frame.GetSize()
+        #vsize = self.frame.GetVirtualSize()
+        # if self.panel.GetSizer() is not self.panel.wrap_sizer:
+        self.panel.SetSizer(self.panel.wrap_sizer)
+        #self.notebook.SetVirtualSize((size[0], vsize[1]))
+        self.panel.SetMaxSize(self.panel.GetParent().GetParent().GetSize())
+        self.panel.SetSize(self.panel.GetParent().GetParent().GetSize())
+        self.panel.Centre()
         event.Skip()
 
-    def filter(self, event):
-        if event:
-            event.Skip()
-
+    def filter(self, event):    
         text = self.text_ctrl.GetValue()
         if text:
             result = list(filter(lambda c: c.name.startswith(text), client.containers.list(True)))
             self.containers.on_next(result)
         else:
             self.containers.on_next(client.containers.list(True))
+        self.update()
+        if event:
+            event.Skip()
 
     def toogle_list(self, event):
-        event.Skip()
+        self.panel.DestroyChildren()
         if self.toogle_list_btn.IsToggled():
-            self.panel.DestroyChildren()
-            self.panel.grid_sizer = wx.BoxSizer(wx.VERTICAL)
+            self.panel.wrap_sizer = wx.BoxSizer(wx.VERTICAL)
         else:
-            self.panel.DestroyChildren()
-            self.panel.grid_sizer = wx.WrapSizer()
+            self.panel.wrap_sizer = wx.WrapSizer()
         self.filter(None)
 
 def main():
-    app = DockerUI()
+    app = DockerUI(redirect=False)
     scheduler = WxScheduler(wx)
     
     def on_next(containers):
@@ -99,7 +119,7 @@ def main():
 
         for c in containers:
             static = Container(app.panel, app, c)
-            app.panel.grid_sizer.Add(static, 0, wx.ALL, border=10)
+            app.panel.wrap_sizer.Add(static, 0, wx.ALL, border=5)
 
         app.update()     
 
@@ -107,7 +127,7 @@ def main():
     app.filter(None)
 
     app.frame.Bind(wx.EVT_CLOSE, lambda e: (scheduler.cancel_all(), e.Skip()))
-    scheduler.schedule_periodic(10, app.filter)
+    #scheduler.schedule_periodic(10, app.filter)
 
     wx.lib.inspection.InspectionTool().Show()
 

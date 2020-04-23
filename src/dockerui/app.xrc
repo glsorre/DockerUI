@@ -1,18 +1,80 @@
-<?xml version="1.0"?>
-<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxFrame" name="mainFrame">
-    <title>Test Frame</title>
+    <title>DockerUI</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE|wxFULL_REPAINT_ON_RESIZE</style>
     <size>600,600</size>
-    <object class="wxScrolledWindow" name="mainWindow">
-
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <object class="wxPanel" name="containersPanel">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxNotebook" name="mainNotebook">
+          <style>wxBK_DEFAULT|wxFULL_REPAINT_ON_RESIZE</style>
+          <object class="notebookpage">
+            <label>Containers</label>
+            <selected>0</selected>
+            <object class="wxPanel" name="containersPage">
+              <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxScrolledWindow" name="containersWindow">
+                    <style>wxFULL_REPAINT_ON_RESIZE|wxVSCROLL</style>
+                    <scrollrate>5,5</scrollrate>
+                    <object class="wxBoxSizer">
+                      <orient>wxVERTICAL</orient>
+                      <object class="sizeritem">
+                        <flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                        <border>5</border>
+                        <option>1</option>
+                        <object class="wxPanel" name="containersPanel">
+                          <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="notebookpage">
+            <label>Images</label>
+            <selected>0</selected>
+            <object class="wxPanel" name="imagesPage">
+              <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxScrolledWindow" name="imagesWindow">
+                    <style>wxFULL_REPAINT_ON_RESIZE|wxVSCROLL</style>
+                    <scrollrate>5,5</scrollrate>
+                    <object class="wxBoxSizer">
+                      <orient>wxVERTICAL</orient>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                        <border>5</border>
+                        <option>1</option>
+                        <object class="wxPanel" name="imagesPanel">
+                          <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
             </object>
           </object>
         </object>
-
+      </object>
     </object>
   </object>
 </resource>

@@ -38,11 +38,11 @@ class Container(wx.Panel):
         _shell.Hide()
         _logs.Hide()
         
-        self.parent.Bind(wx.EVT_BUTTON, self.start, _start)
-        self.parent.Bind(wx.EVT_BUTTON, self.stop, _stop)
-        self.parent.Bind(wx.EVT_BUTTON, self.remove, _remove)
-        self.parent.Bind(wx.EVT_BUTTON, self.shell, _shell)
-        self.parent.Bind(wx.EVT_BUTTON, self.logs, _logs)
+        app.frame.Bind(wx.EVT_BUTTON, self.start, _start)
+        app.frame.Bind(wx.EVT_BUTTON, self.stop, _stop)
+        app.frame.Bind(wx.EVT_BUTTON, self.remove, _remove)
+        app.frame.Bind(wx.EVT_BUTTON, self.shell, _shell)
+        app.frame.Bind(wx.EVT_BUTTON, self.logs, _logs)
         
         container_toolbar = wx.BoxSizer(wx.HORIZONTAL)
         if self.is_running():
