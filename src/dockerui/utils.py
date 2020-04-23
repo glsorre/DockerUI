@@ -1,11 +1,12 @@
 import wx
 
 class Container(wx.Panel):
-    def __init__(self, parent, app, container):
+    def __init__(self, parent, app, state, container):
+        super(Container, self).__init__(parent)
         self.container = container
         self.parent = parent
         self.app = app
-        super(Container, self).__init__(parent)
+        self.state = state
 
         if self.is_running():
             self.SetBackgroundColour(wx.Colour(120,200,120))
@@ -50,20 +51,20 @@ class Container(wx.Panel):
             _remove.Show()
             _shell.Show()
             _logs.Show()
-            container_toolbar.Add(_stop, 0, wx.EXPAND | wx.ALL, border=4)
-            container_toolbar.Add(_shell, 0, wx.EXPAND | wx.ALL, border=4)
-            container_toolbar.Add(_logs, 0, wx.EXPAND | wx.ALL, border=4)
-            container_toolbar.Add(_remove, 0, wx.EXPAND | wx.ALL, border=4)
+            container_toolbar.Add(_stop, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_shell, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_logs, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=4)
         else:
             _start.Show()
             _remove.Show()
-            container_toolbar.Add(_start, 0, wx.EXPAND | wx.ALL, border=4)
-            container_toolbar.Add(_remove, 0, wx.EXPAND | wx.ALL, border=4)
+            container_toolbar.Add(_start, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=4)
 
 
-        self.panel_sizer.Add(_name, 0, wx.EXPAND | wx.ALL, border=4)
-        self.panel_sizer.Add(_image, 0, wx.EXPAND | wx.ALL, border=4)
-        self.panel_sizer.Add(_status, 0, wx.EXPAND | wx.ALL, border=4)
+        self.panel_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=4)
+        self.panel_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=4)
+        self.panel_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=4)
         self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND | wx.ALL, border=4)
 
         self.SetSizer(self.panel_sizer)
@@ -76,12 +77,12 @@ class Container(wx.Panel):
 
     def start(self, event):
         self.container.start()
-        self.app.filter(None)
+        self.app.scheduler.schedule(self.app.refresh_containers, self.state)
         event.Skip();
 
     def stop(self, event):
         self.container.stop()
-        self.app.filter(None)
+        self.app.scheduler.schedule(self.app.refresh_containers, self.state)
         event.Skip();
 
     def remove(self, event):
@@ -90,15 +91,16 @@ class Container(wx.Panel):
         if result == wx.ID_YES:
             self.container.stop()
             self.container.remove()
-            self.app.filter(None)
+            self.app.scheduler.schedule(self.app.refresh_containers, self.state)
         event.Skip();
 
     def shell(self, event):
         #self.container.stop()
-        self.app.filter(None)
+        self.app.scheduler.schedule(self.app.refresh_containers, self.state)
         event.Skip();
 
     def logs(self, event):
         #self.container.stop()
-        self.app.filter(None)
+        self.app.scheduler.schedule(self.app.refresh_containers, self.state)
         event.Skip();
+

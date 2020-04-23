@@ -1,11 +1,9 @@
-from src.dockerui.container import Container
+from src.dockerui.utils import Container
 
 import time
 
 import docker
-import rx
 
-from rx.subject import Subject
 from rx.scheduler.mainloop import WxScheduler
 
 import wx
@@ -23,28 +21,24 @@ class DockerUI(wx.App):
     def OnInit(self):
         self.res = wx.xrc.XmlResource.Get()
         self.res.LoadFile(RSRC_FILE)
-        self.containers = Subject()
-        self.images = Subject()
         self.render()
         self.toolbar()
         self.menu()
+        self.frame.Show()
         return True
     
     def render(self):
         self.frame = self.res.LoadFrame(None, RSRC_FRAMENAME)
         self.SetTopWindow(self.frame)
-        self.frame.SetMinSize((400, 200))
-        self.frame.SetSize((600, 600))
-        self.frame.Centre(wx.BOTH)
         self.notebook = wx.xrc.XRCCTRL(self.frame, "mainNotebook")
         self.window = wx.xrc.XRCCTRL(self.frame, "containersWindow")
         self.panel = wx.xrc.XRCCTRL(self.frame, "containersPanel")
         self.page = wx.xrc.XRCCTRL(self.frame, "containersPage")
-        self.panel.wrap_sizer = wx.WrapSizer()
         self.window.SetScrollRate(5,5)
+        self.frame.SetSize(600,600)
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
         self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
-        self.frame.Show()
+        self.notebook.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
 
     def menu(self):
         menu_bar  = wx.MenuBar()
@@ -58,6 +52,7 @@ class DockerUI(wx.App):
 
     def toolbar(self):
         self.toolbar = wx.ToolBar(self.frame)
+        self.toolbar.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
         self.text_ctrl = wx.TextCtrl(self.toolbar)
         self.text_ctrl.SetHint("Search")  
 
@@ -70,64 +65,78 @@ class DockerUI(wx.App):
         self.toolbar.AddControl(self.text_ctrl)
         refresh = self.toolbar.AddTool(wx.ID_ANY, 'Refresh', bmp)
 
-        self.frame.Bind(wx.EVT_TEXT, self.filter, self.text_ctrl)
-        self.frame.Bind(wx.EVT_BUTTON, self.filter, refresh)
-        self.frame.Bind(wx.EVT_TOOL, self.toogle_list, self.toogle_list_btn)
+        self.frame.Bind(wx.EVT_TEXT, self.refresh_action, self.text_ctrl)
+        self.frame.Bind(wx.EVT_BUTTON, self.refresh_action, refresh)
+        self.frame.Bind(wx.EVT_TOOL, self.toogle_list_action, self.toogle_list_btn)
 
         self.toolbar.Realize()
 
-    def update(self):
-        self.panel.SetSizer(self.panel.wrap_sizer)
-        self.frame.SendSizeEvent()
+    def refresh_containers(self, scheduler, state):
+        print("refreshing containers")
+        containers_list = self.get_containers_list()
+        print(containers_list)
 
+        print(state["is_list"])
+
+        if state["is_list"]:
+            new_sizer = wx.BoxSizer(wx.VERTICAL)
+        else:
+            new_sizer = wx.WrapSizer()
+
+        if self.panel.GetSizer().GetItemCount() > 0:
+            self.panel.DestroyChildren()
+            self.panel.GetSizer().Remove(0)
+
+        for c in containers_list:
+            static = Container(self.panel, self, state, c)
+            state['containers'].append(c)
+            new_sizer.Add(static, 0, wx.ALL|wx.EXPAND, border=5)
+        
+        self.panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
+        
+        self.frame.SendSizeEvent()
+        
     def on_size(self, event):
-        #size = self.frame.GetSize()
-        #vsize = self.frame.GetVirtualSize()
-        # if self.panel.GetSizer() is not self.panel.wrap_sizer:
-        self.panel.SetSizer(self.panel.wrap_sizer)
-        #self.notebook.SetVirtualSize((size[0], vsize[1]))
-        self.panel.SetMaxSize(self.panel.GetParent().GetParent().GetSize())
-        self.panel.SetSize(self.panel.GetParent().GetParent().GetSize())
-        self.panel.Centre()
+        print("resizing")
+        size = self.panel.GetParent().GetParent().GetSize()
+        vsize = self.panel.GetParent().GetVirtualSize()
+        self.panel.SetMaxSize((size[0], vsize[1]))
+        self.panel.GetSizer().Layout()
+        self.panel.Layout()
         event.Skip()
 
-    def filter(self, event):    
+    def get_containers_list(self):
+        print("getting containers list")
         text = self.text_ctrl.GetValue()
         if text:
             result = list(filter(lambda c: c.name.startswith(text), client.containers.list(True)))
-            self.containers.on_next(result)
         else:
-            self.containers.on_next(client.containers.list(True))
-        self.update()
-        if event:
-            event.Skip()
+            result = client.containers.list(True)
+        return result
 
-    def toogle_list(self, event):
-        self.panel.DestroyChildren()
-        if self.toogle_list_btn.IsToggled():
-            self.panel.wrap_sizer = wx.BoxSizer(wx.VERTICAL)
-        else:
-            self.panel.wrap_sizer = wx.WrapSizer()
-        self.filter(None)
+    def refresh_action(self, event):
+        self.scheduler.schedule(self.refresh_containers, state)
+        event.Skip()
+
+    def toogle_list_action(self, event):
+        print("toggling list view")
+        state["is_list"] = self.toogle_list_btn.IsToggled()
+        self.scheduler.schedule(self.refresh_containers, state)
+        event.Skip()
 
 def main():
     app = DockerUI(redirect=False)
-    scheduler = WxScheduler(wx)
-    
-    def on_next(containers):
-        app.panel.DestroyChildren()
+    app.scheduler = WxScheduler(wx)
 
-        for c in containers:
-            static = Container(app.panel, app, c)
-            app.panel.wrap_sizer.Add(static, 0, wx.ALL, border=5)
+    global state
+    state = {
+        "containers": [],
+        "images": [],
+        "is_list": False
+    }
 
-        app.update()     
-
-    app.containers.subscribe(on_next, on_error=print, scheduler=scheduler)
-    app.filter(None)
-
-    app.frame.Bind(wx.EVT_CLOSE, lambda e: (scheduler.cancel_all(), e.Skip()))
-    #scheduler.schedule_periodic(10, app.filter)
+    app.frame.Bind(wx.EVT_CLOSE, lambda e: (app.scheduler.cancel_all(), e.Skip()))
+    app.scheduler.schedule(app.refresh_containers, state)
 
     wx.lib.inspection.InspectionTool().Show()
 

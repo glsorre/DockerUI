@@ -3,7 +3,7 @@
   <object class="wxFrame" name="mainFrame">
     <title>DockerUI</title>
     <centered>1</centered>
-    <style>wxDEFAULT_FRAME_STYLE|wxFULL_REPAINT_ON_RESIZE</style>
+    <style>wxDEFAULT_FRAME_STYLE</style>
     <size>600,600</size>
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
@@ -12,12 +12,12 @@
         <border>5</border>
         <option>1</option>
         <object class="wxNotebook" name="mainNotebook">
-          <style>wxBK_DEFAULT|wxFULL_REPAINT_ON_RESIZE</style>
+          <style>wxBK_DEFAULT</style>
           <object class="notebookpage">
             <label>Containers</label>
             <selected>0</selected>
             <object class="wxPanel" name="containersPage">
-              <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+              <style>wxTAB_TRAVERSAL</style>
               <object class="wxBoxSizer">
                 <orient>wxVERTICAL</orient>
                 <object class="sizeritem">
@@ -25,7 +25,7 @@
                   <border>5</border>
                   <option>1</option>
                   <object class="wxScrolledWindow" name="containersWindow">
-                    <style>wxFULL_REPAINT_ON_RESIZE|wxVSCROLL</style>
+                    <style>wxVSCROLL</style>
                     <scrollrate>5,5</scrollrate>
                     <object class="wxBoxSizer">
                       <orient>wxVERTICAL</orient>
@@ -34,7 +34,10 @@
                         <border>5</border>
                         <option>1</option>
                         <object class="wxPanel" name="containersPanel">
-                          <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxBoxSizer">
+                          <orient>wxVERTICAL</orient>
+                          </object>
                         </object>
                       </object>
                     </object>
@@ -47,7 +50,7 @@
             <label>Images</label>
             <selected>0</selected>
             <object class="wxPanel" name="imagesPage">
-              <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+              <style>wxTAB_TRAVERSAL</style>
               <object class="wxBoxSizer">
                 <orient>wxVERTICAL</orient>
                 <object class="sizeritem">
@@ -55,7 +58,7 @@
                   <border>5</border>
                   <option>1</option>
                   <object class="wxScrolledWindow" name="imagesWindow">
-                    <style>wxFULL_REPAINT_ON_RESIZE|wxVSCROLL</style>
+                    <style>wxVSCROLL</style>
                     <scrollrate>5,5</scrollrate>
                     <object class="wxBoxSizer">
                       <orient>wxVERTICAL</orient>
@@ -64,7 +67,7 @@
                         <border>5</border>
                         <option>1</option>
                         <object class="wxPanel" name="imagesPanel">
-                          <style>wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+                          <style>wxTAB_TRAVERSAL</style>
                         </object>
                       </object>
                     </object>
