@@ -28,7 +28,6 @@ class DockerUI(wx.App):
         self.toolbar()
         self.menu()
         self.frame.Show()
-        self.panel.SetBackgroundColour("#000000")
         self.frame.Layout()
         return True
     
@@ -44,6 +43,7 @@ class DockerUI(wx.App):
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
         self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
         self.notebook.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
+        self.panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
 
     def menu(self):
         menu_bar  = wx.MenuBar()

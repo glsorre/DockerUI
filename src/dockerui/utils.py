@@ -35,12 +35,14 @@ class Container(wx.Panel):
         _status = wx.StaticText(self)
         _status.SetFont(wx.Font(wx.FontInfo(9)))
         _status.SetLabel(container.status.upper())
+
+        bmp = wx.ArtProvider.GetBitmap(wx.ART_UNDO)
         
-        _start = wx.Button(self, label='Start')
-        _stop = wx.Button(self, label='Stop')
-        _remove = wx.Button(self, label='Remove')
-        _shell = wx.Button(self, label='Shell')
-        _logs = wx.Button(self, label='Logs')
+        _start = wx.BitmapButton(self, bitmap=bmp, name='Start')
+        _stop = wx.BitmapButton(self, bitmap=bmp, name='Stop')
+        _remove = wx.BitmapButton(self, bitmap=bmp, name='Remove')
+        _shell = wx.BitmapButton(self, bitmap=bmp, name='Shell')
+        _logs = wx.BitmapButton(self, bitmap=bmp, name='Logs')
 
         _start.Hide()
         _stop.Hide()
@@ -60,23 +62,25 @@ class Container(wx.Panel):
             _remove.Show()
             _shell.Show()
             _logs.Show()
-            container_toolbar.Add(_stop, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-            container_toolbar.Add(_shell, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-            container_toolbar.Add(_logs, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.AddStretchSpacer()
+            container_toolbar.Add(_stop, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
+            container_toolbar.Add(_shell, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
+            container_toolbar.Add(_logs, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
         else:
             _start.Show()
             _remove.Show()
-            container_toolbar.Add(_start, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.AddStretchSpacer()
+            container_toolbar.Add(_start, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
 
 
         info_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         info_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         info_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         
-        self.panel_sizer.Add(info_sizer, 0, wx.EXPAND|wx.ALL, border=BORDER_CONTAINER)
-        self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND|wx.ALL|wx.ALIGN_RIGHT, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(container_toolbar, 1, wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Layout()
@@ -100,9 +104,9 @@ class Container(wx.Panel):
         event.Skip();
 
     def remove(self, event):
-        dlg = wx.MessageDialog(None, "Do you want to force the container removal?",'Remove Container', wx.OK_CANCEL | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, "Do you want to force the container removal?",'Remove Container', wx.OK|wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_QUESTION)
         result = dlg.ShowModal()
-        if result == wx.ID_YES:
+        if result == wx.ID_OK:
             self.container.stop()
             self.container.remove()
             self.app.scheduler.schedule(self.app.refresh_containers, self.state)
