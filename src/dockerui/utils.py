@@ -2,6 +2,8 @@ from threading import Timer
 
 import wx
 
+BORDER_CONTAINER = 4
+
 class Container(wx.Panel):
     def __init__(self, parent, app, state, container):
         super(Container, self).__init__(parent)
@@ -53,21 +55,21 @@ class Container(wx.Panel):
             _remove.Show()
             _shell.Show()
             _logs.Show()
-            container_toolbar.Add(_stop, 0, wx.ALL|wx.EXPAND, border=4)
-            container_toolbar.Add(_shell, 0, wx.ALL|wx.EXPAND, border=4)
-            container_toolbar.Add(_logs, 0, wx.ALL|wx.EXPAND, border=4)
-            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_stop, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.Add(_shell, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.Add(_logs, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         else:
             _start.Show()
             _remove.Show()
-            container_toolbar.Add(_start, 0, wx.ALL|wx.EXPAND, border=4)
-            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=4)
+            container_toolbar.Add(_start, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+            container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
 
 
-        self.panel_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=4)
-        self.panel_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=4)
-        self.panel_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=4)
-        self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND | wx.ALL, border=4)
+        self.panel_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND | wx.ALL, border=BORDER_CONTAINER)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.SetSizerAndFit(self.panel_sizer)
@@ -112,7 +114,7 @@ class Container(wx.Panel):
 
     def on_size(self, event):
         print("resizing containers")
-        self.SetSizeAndFit(self.GetBestSize())
+        self.SetSizerAndFit(self.panel_sizer)
         self.SetMinSize(self.GetBestSize())
         self.SetSizerAndFit(self.panel_sizer)
         self.Layout()

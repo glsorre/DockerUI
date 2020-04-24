@@ -1,5 +1,4 @@
-from src.dockerui.utils import Container
-
+import sys
 import time
 
 import docker
@@ -10,8 +9,12 @@ import wx
 import wx.lib.inspection
 import wx.xrc
 
+from src.dockerui.utils import Container
+
 RSRC_FILE = "src/dockerui/app.xrc"
 RSRC_FRAMENAME = "mainFrame"
+
+BORDER_MAIN = 5
 
 client = docker.from_env()
 
@@ -36,7 +39,7 @@ class DockerUI(wx.App):
         self.window = wx.xrc.XRCCTRL(self.frame, "containersWindow")
         self.panel = wx.xrc.XRCCTRL(self.frame, "containersPanel")
         self.page = wx.xrc.XRCCTRL(self.frame, "containersPage")
-        self.window.SetScrollRate(5,5)
+        self.window.SetScrollRate(BORDER_MAIN,BORDER_MAIN)
         self.frame.SetSize(600,600)
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
         self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
@@ -91,7 +94,7 @@ class DockerUI(wx.App):
         for c in containers_list:
             static = Container(self.panel, self, state, c)
             state['containers'].append(c)
-            new_sizer.Add(static, 0, wx.ALL|wx.EXPAND, border=5)
+            new_sizer.Add(static, 0, wx.ALL|wx.EXPAND, border=BORDER_MAIN)
         
         self.panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
         self.panel.Show()
@@ -99,15 +102,11 @@ class DockerUI(wx.App):
 
     def refresh_view(self):
         print("resizing")
-        size = self.page.GetSize()
-        vsize = self.window.GetVirtualSize()
-        min_size = self.panel.GetMinSize()
-        best_size = self.panel.GetBestSize()
-        self.panel.SetMinSize(min_size)
-        if size[0] > min_size[0]:
-            self.panel.SetMaxSize((size[0], vsize[1]))
-        else:
-            self.panel.SetMaxSize((min_size[0], vsize[1]))
+        page_size = self.page.GetSize()
+        sizer_size = self.panel.GetSizer().CalcMin()
+        container_bigger_size = self.panel.GetChildren()[self.get_bigger_container()].GetMinSize()
+        self.panel.SetMinSize((container_bigger_size[0], sizer_size[1]))
+        self.panel.SetMaxSize((page_size[0], (sys.maxsize * 2 + 1)))
         self.panel.GetSizer().Layout()
         self.panel.Layout()
 
@@ -118,10 +117,7 @@ class DockerUI(wx.App):
     def get_containers_list(self):
         print("getting containers list")
         text = self.text_ctrl.GetValue()
-        if text:
-            result = list(filter(lambda c: c.name.startswith(text), client.containers.list(True)))
-        else:
-            result = client.containers.list(True)
+        result = client.containers.list(True, filters={"name":self.text_ctrl.GetValue()})
         return result
 
     def refresh_action(self, event):
@@ -139,15 +135,15 @@ class DockerUI(wx.App):
         bigger_size = 0
 
         for i, c in enumerate(self.panel.GetChildren()):
-            if c.GetBestSize()[1] > bigger_size:
+            if c.GetSize()[0] > bigger_size:
                 bigger = i
-                bigger_size = c.GetSize()[1]
+                bigger_size = c.GetSize()[1] + BORDER_MAIN
 
         print(bigger)
         return bigger
 
 def main():
-    app = DockerUI(redirect=True, useBestVisual=True)
+    app = DockerUI(redirect=False, useBestVisual=True)
     app.scheduler = WxScheduler(wx)
 
     global state
