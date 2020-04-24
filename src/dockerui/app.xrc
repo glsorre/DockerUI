@@ -68,6 +68,9 @@
                         <option>1</option>
                         <object class="wxPanel" name="imagesPanel">
                           <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxBoxSizer">
+                          <orient>wxVERTICAL</orient>
+                          </object>
                         </object>
                       </object>
                     </object>
