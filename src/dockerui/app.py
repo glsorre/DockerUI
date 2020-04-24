@@ -95,14 +95,22 @@ class DockerUI(wx.App):
         self.panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
         
         self.frame.SendSizeEvent()
-        
+
     def on_size(self, event):
         print("resizing")
         size = self.panel.GetParent().GetParent().GetSize()
         vsize = self.panel.GetParent().GetVirtualSize()
-        self.panel.SetMaxSize((size[0], vsize[1]))
+        min_size = self.panel.GetChildren()[self.get_bigger_container()].GetSize()
+        # self.panel.SetMinSize(min_size)
+        if size[0] > min_size[0]:
+            self.panel.SetMaxSize((size[0], vsize[1]))
+        else:
+            self.panel.SetMaxSize((min_size[0], vsize[1]))
         self.panel.GetSizer().Layout()
         self.panel.Layout()
+        # self.window.GetSizer().Layout()
+        # self.window.Layout()
+        self.panel.SetBackgroundColour("#000000")
         event.Skip()
 
     def get_containers_list(self):
@@ -123,6 +131,18 @@ class DockerUI(wx.App):
         state["is_list"] = self.toogle_list_btn.IsToggled()
         self.scheduler.schedule(self.refresh_containers, state)
         event.Skip()
+
+    def get_bigger_container(self):
+        bigger = 0
+        bigger_size = 0
+
+        for i, c in enumerate(self.panel.GetChildren()):
+            if c.GetBestSize()[1] > bigger_size:
+                bigger = i
+                bigger_size = c.GetSize()[1]
+
+        print(bigger)
+        return bigger
 
 def main():
     app = DockerUI(redirect=False)

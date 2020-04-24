@@ -25,12 +25,12 @@
                   <border>5</border>
                   <option>1</option>
                   <object class="wxScrolledWindow" name="containersWindow">
-                    <style>wxVSCROLL</style>
+                    <style>wxVSCROLL|wxHSCROLL</style>
                     <scrollrate>5,5</scrollrate>
                     <object class="wxBoxSizer">
                       <orient>wxVERTICAL</orient>
                       <object class="sizeritem">
-                        <flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                        <flag>wxALL|wxEXPAND</flag>
                         <border>5</border>
                         <option>1</option>
                         <object class="wxPanel" name="containersPanel">
@@ -58,12 +58,12 @@
                   <border>5</border>
                   <option>1</option>
                   <object class="wxScrolledWindow" name="imagesWindow">
-                    <style>wxVSCROLL</style>
+                    <style>wxVSCROLL|wxHSCROLL</style>
                     <scrollrate>5,5</scrollrate>
                     <object class="wxBoxSizer">
                       <orient>wxVERTICAL</orient>
                       <object class="sizeritem">
-                        <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                        <flag>wxALL|wxEXPAND</flag>
                         <border>5</border>
                         <option>1</option>
                         <object class="wxPanel" name="imagesPanel">
