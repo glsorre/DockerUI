@@ -108,8 +108,8 @@ class DockerUI(wx.App):
             self.panel.SetMaxSize((min_size[0], vsize[1]))
         self.panel.GetSizer().Layout()
         self.panel.Layout()
-        # self.window.GetSizer().Layout()
-        # self.window.Layout()
+        self.window.GetSizer().Layout()
+        self.window.Layout()
         self.panel.SetBackgroundColour("#000000")
         event.Skip()
 
@@ -145,7 +145,7 @@ class DockerUI(wx.App):
         return bigger
 
 def main():
-    app = DockerUI(redirect=False)
+    app = DockerUI(redirect=True, useBestVisual=True)
     app.scheduler = WxScheduler(wx)
 
     global state

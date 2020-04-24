@@ -109,7 +109,7 @@ class Container(wx.Panel):
 
     def on_size(self, event):
         print("resizing containers")
-        self.SetSizerAndFit(self.panel_sizer)
+        self.SetSizer(self.panel_sizer)
         self.SetMinSize(self.GetBestSize())
         self.Layout()
 
