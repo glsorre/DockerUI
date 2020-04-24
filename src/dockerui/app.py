@@ -146,7 +146,7 @@ class DockerUI(wx.App):
         return bigger
 
 def main():
-    app = DockerUI(redirect=False)
+    app = DockerUI(redirect=True, useBestVisual=True)
     app.scheduler = WxScheduler(wx)
 
     global state
