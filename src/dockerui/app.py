@@ -25,6 +25,8 @@ class DockerUI(wx.App):
         self.toolbar()
         self.menu()
         self.frame.Show()
+        self.panel.SetBackgroundColour("#000000")
+        self.frame.Layout()
         return True
     
     def render(self):
@@ -63,10 +65,10 @@ class DockerUI(wx.App):
         self.toogle_list_btn = self.toolbar.AddCheckTool(wx.ID_ANY, 'Toogle list view', bmp)
         self.toolbar.AddStretchableSpace()
         self.toolbar.AddControl(self.text_ctrl)
-        refresh = self.toolbar.AddTool(wx.ID_ANY, 'Refresh', bmp)
+        self.refresh = self.toolbar.AddTool(wx.ID_ANY, 'Refresh', bmp)
 
         self.frame.Bind(wx.EVT_TEXT, self.refresh_action, self.text_ctrl)
-        self.frame.Bind(wx.EVT_BUTTON, self.refresh_action, refresh)
+        self.frame.Bind(wx.EVT_TOOL, self.refresh_action, self.refresh)
         self.frame.Bind(wx.EVT_TOOL, self.toogle_list_action, self.toogle_list_btn)
 
         self.toolbar.Realize()
@@ -76,8 +78,7 @@ class DockerUI(wx.App):
         containers_list = self.get_containers_list()
         print(containers_list)
 
-        print(state["is_list"])
-
+        self.panel.Hide()
         if state["is_list"]:
             new_sizer = wx.BoxSizer(wx.VERTICAL)
         else:
@@ -93,24 +94,24 @@ class DockerUI(wx.App):
             new_sizer.Add(static, 0, wx.ALL|wx.EXPAND, border=5)
         
         self.panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
-        
-        self.frame.SendSizeEvent()
+        self.panel.Show()
+        self.refresh_view()
 
-    def on_size(self, event):
+    def refresh_view(self):
         print("resizing")
-        size = self.panel.GetParent().GetParent().GetSize()
-        vsize = self.panel.GetParent().GetVirtualSize()
-        min_size = self.panel.GetChildren()[self.get_bigger_container()].GetSize()
-        # self.panel.SetMinSize(min_size)
+        size = self.page.GetSize()
+        vsize = self.window.GetVirtualSize()
+        min_size = self.panel.GetBestSize()
+        self.panel.SetMinSize(min_size)
         if size[0] > min_size[0]:
             self.panel.SetMaxSize((size[0], vsize[1]))
         else:
             self.panel.SetMaxSize((min_size[0], vsize[1]))
         self.panel.GetSizer().Layout()
         self.panel.Layout()
-        # self.window.GetSizer().Layout()
-        # self.window.Layout()
-        self.panel.SetBackgroundColour("#000000")
+
+    def on_size(self, event):
+        self.refresh_view()
         event.Skip()
 
     def get_containers_list(self):
