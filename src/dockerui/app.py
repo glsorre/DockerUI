@@ -101,7 +101,8 @@ class DockerUI(wx.App):
         print("resizing")
         size = self.page.GetSize()
         vsize = self.window.GetVirtualSize()
-        min_size = self.panel.GetBestSize()
+        min_size = self.panel.GetMinSize()
+        best_size = self.panel.GetBestSize()
         self.panel.SetMinSize(min_size)
         if size[0] > min_size[0]:
             self.panel.SetMaxSize((size[0], vsize[1]))

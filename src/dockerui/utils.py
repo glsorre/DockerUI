@@ -70,7 +70,7 @@ class Container(wx.Panel):
         self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND | wx.ALL, border=4)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
-        self.SetSizer(self.panel_sizer)
+        self.SetSizerAndFit(self.panel_sizer)
         self.SetSize(self.GetBestSize())
         self.SetMinSize(self.GetBestSize())
         self.Layout()
@@ -112,7 +112,7 @@ class Container(wx.Panel):
 
     def on_size(self, event):
         print("resizing containers")
-        self.SetSize(self.GetBestSize())
+        self.SetSizeAndFit(self.GetBestSize())
         self.SetMinSize(self.GetBestSize())
         self.SetSizerAndFit(self.panel_sizer)
         self.Layout()
