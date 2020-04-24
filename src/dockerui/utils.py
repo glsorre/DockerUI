@@ -18,8 +18,13 @@ class Container(wx.Panel):
             self.SetBackgroundColour(wx.Colour(120,120,120))
         else:
             self.SetBackgroundColour(wx.Colour(200,120,120))
+        
+        if state["is_list"]:
+            self.panel_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        else:
+            self.panel_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        info_sizer = wx.BoxSizer(wx.VERTICAL)
 
         _name = wx.StaticText(self)
         _name.SetFont(wx.Font(wx.FontInfo(14).Bold()))
@@ -66,16 +71,17 @@ class Container(wx.Panel):
             container_toolbar.Add(_remove, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
 
 
-        self.panel_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-        self.panel_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-        self.panel_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-        self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND | wx.ALL, border=BORDER_CONTAINER)
+        info_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        info_sizer.Add(_image, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        info_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        
+        self.panel_sizer.Add(info_sizer, 0, wx.EXPAND|wx.ALL, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(container_toolbar, 0, wx.EXPAND|wx.ALL|wx.ALIGN_RIGHT, border=BORDER_CONTAINER)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
-        self.SetSizerAndFit(self.panel_sizer)
-        self.SetSize(self.GetBestSize())
-        #self.SetMinSize(self.GetBestSize())
         self.Layout()
+
+        self.refresh_view()
 
     def is_running(self):
         return self.container.status == 'running'
@@ -94,7 +100,7 @@ class Container(wx.Panel):
         event.Skip();
 
     def remove(self, event):
-        dlg = wx.MessageDialog(None, "Do you want to forcet remove the container",'Remove Container', wx.YES_NO | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, "Do you want to force the container removal?",'Remove Container', wx.OK_CANCEL | wx.ICON_QUESTION)
         result = dlg.ShowModal()
         if result == wx.ID_YES:
             self.container.stop()
@@ -113,8 +119,14 @@ class Container(wx.Panel):
         event.Skip();
 
     def on_size(self, event):
+        self.refresh_view()
+        event.Skip()
+
+    def refresh_view(self):
         print("resizing containers")
-        self.SetSizerAndFit(self.panel_sizer)
-        self.SetSize(self.GetBestSize())
+        self.SetSizer(self.panel_sizer)
+        if not self.state['is_list']:
+            self.SetSizerAndFit(self.panel_sizer)
+            self.SetSize(self.GetBestSize())
         self.Layout()
 

@@ -102,9 +102,9 @@ class DockerUI(wx.App):
 
     def refresh_view(self):
         print("resizing")
-        page_size = self.page.GetSize()
+        page_size = self.page.GetMinSize()
         sizer_size = self.panel.GetSizer().CalcMin()
-        container_bigger_size = self.panel.GetChildren()[self.get_bigger_container()].GetMinSize()
+        container_bigger_size = self.panel.GetChildren()[self.get_bigger_container()].GetSize()
         self.panel.SetMinSize((container_bigger_size[0], sizer_size[1]))
         self.panel.SetMaxSize((page_size[0], (sys.maxsize * 2 + 1)))
         self.panel.GetSizer().Layout()
@@ -137,13 +137,13 @@ class DockerUI(wx.App):
         for i, c in enumerate(self.panel.GetChildren()):
             if c.GetSize()[0] > bigger_size:
                 bigger = i
-                bigger_size = c.GetSize()[1] + BORDER_MAIN
+                bigger_size = c.GetSize()[0] + BORDER_MAIN
 
-        print(bigger)
+        print(f"the bigger container is n {bigger}")
         return bigger
 
 def main():
-    app = DockerUI(redirect=False, useBestVisual=True)
+    app = DockerUI(redirect=False)
     app.scheduler = WxScheduler(wx)
 
     global state
