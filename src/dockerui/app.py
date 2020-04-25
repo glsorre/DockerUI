@@ -9,7 +9,8 @@ import wx
 import wx.lib.inspection
 import wx.xrc
 
-from src.dockerui.utils import Container, Image
+from src.dockerui.container import Container
+from src.dockerui.image import Image
 
 RSRC_FILE = "src/dockerui/app.xrc"
 RSRC_FRAMENAME = "mainFrame"
@@ -48,6 +49,7 @@ class DockerUI(wx.App):
 
         self.frame.SetSize(600,600)
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
+        self.frame.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.changing_tab_action, self.notebook)
 
         self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
         self.notebook.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
@@ -107,7 +109,7 @@ class DockerUI(wx.App):
         
         self.containers_panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
         self.containers_panel.Show()
-        self.refresh_view()
+        self.refresh_containers_view()
 
     def refresh_images(self, scheduler, state):
         print("refreshing images")
@@ -131,9 +133,9 @@ class DockerUI(wx.App):
         
         self.images_panel.GetSizer().Add(new_sizer, 0, wx.ALL|wx.EXPAND)
         self.images_panel.Show()
-        self.refresh_view()
+        self.refresh_images_view()
 
-    def refresh_view(self):
+    def refresh_containers_view(self):
         print("resizing containers panel")
         containers_page_size = self.containers_page.GetMinSize()
         containers_sizer_size = self.containers_panel.GetSizer().CalcMin()
@@ -143,38 +145,45 @@ class DockerUI(wx.App):
         self.containers_panel.GetSizer().Layout()
         self.containers_panel.Layout()
 
+    def refresh_images_view(self):
         print("resizing images panel")
         images_page_size = self.images_page.GetMinSize()
         images_sizer_size = self.images_panel.GetSizer().CalcMin()
-        if self.images_panel.GetChildren():
-            image_bigger_size = self.images_panel.GetChildren()[self.get_bigger_image()].GetSize()
-        else:
-            image_bigger_size = (0, 0)
+        image_bigger_size = self.images_panel.GetChildren()[self.get_bigger_image()].GetSize()
         self.images_panel.SetMinSize((image_bigger_size[0], images_sizer_size[1]))
         self.images_panel.SetMaxSize((images_page_size[0], (sys.maxsize * 2 + 1)))
         self.images_panel.GetSizer().Layout()
         self.images_panel.Layout()
 
     def on_size(self, event):
-        self.refresh_view()
+        self.refresh_containers_view()
+        self.refresh_images_view()
         event.Skip()
 
     def get_containers_list(self):
         print("getting containers list")
         text = self.text_ctrl.GetValue()
-        result = client.containers.list(True, filters={"name":self.text_ctrl.GetValue()})
+        result = client.containers.list(True, filters={"name": self.text_ctrl.GetValue()})
         result = sorted(result, key=lambda c: c.name)
         return result
 
     def get_images_list(self):
         print("getting images list")
         text = self.text_ctrl.GetValue()
-        result = client.images.list(all=True)
-        #result = sorted(result, key=lambda i: i.name)
+        result = client.images.list()
+        result = list(filter(lambda i: i.attrs["RepoTags"][0].startswith(self.text_ctrl.GetValue()), result))
+        result = sorted(result, key=lambda i: i.attrs["RepoTags"][0])
         return result
 
     def refresh_action(self, event):
-        self.scheduler.schedule(self.refresh_containers, state)
+        if self.notebook.GetSelection() == 0:
+            self.scheduler.schedule(self.refresh_containers, state)
+        else:
+            self.scheduler.schedule(self.refresh_images, state)
+        event.Skip()
+
+    def changing_tab_action(self, event):
+        self.text_ctrl.SetValue("")
         event.Skip()
 
     def toogle_list_action(self, event):
@@ -204,7 +213,7 @@ class DockerUI(wx.App):
                 bigger = i
                 bigger_size = img.GetSize()[0] + BORDER_MAIN
 
-        print(f"the bigger container is n {bigger}")
+        print(f"the bigger image is n {bigger}")
         return bigger
 
 def main():
