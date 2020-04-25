@@ -1,6 +1,6 @@
 import wx
 
-BORDER_CONTAINER = 4
+from src.dockerui.constants import *
 
 class Image(wx.Panel):
     def __init__(self, parent, app, state, image):
@@ -76,14 +76,14 @@ class Image(wx.Panel):
         #     container_toolbar.Add(_remove, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
 
 
-        info_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
-        info_sizer.Add(_description, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
+        info_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_IMAGE)
+        info_sizer.Add(_description, 0, wx.ALL|wx.EXPAND, border=BORDER_IMAGE)
         #info_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         
         # self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_CONTAINER)
         # self.panel_sizer.Add(container_toolbar, 1, wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
 
-        self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_CONTAINER)
+        self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_IMAGE)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Layout()

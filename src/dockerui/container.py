@@ -1,6 +1,6 @@
 import wx
 
-BORDER_CONTAINER = 4
+from src.dockerui.constants import *
 
 class Container(wx.Panel):
     def __init__(self, parent, app, state, container):
@@ -84,7 +84,11 @@ class Container(wx.Panel):
         info_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         
         self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_CONTAINER)
-        self.panel_sizer.Add(container_toolbar, 1, wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
+
+        if self.panel_sizer.GetOrientation() == wx.VERTICAL:
+            self.panel_sizer.Add(container_toolbar, 1, wx.ALL, border=BORDER_CONTAINER)
+        else:
+            self.panel_sizer.Add(container_toolbar, 1, wx.ALIGN_CENTER_VERTICAL, border=BORDER_CONTAINER)
 
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Layout()

@@ -10,18 +10,12 @@ import wx.lib.inspection
 import wx.xrc
 
 from src.dockerui.container import Container
+from src.dockerui.constants import *
 from src.dockerui.image import Image
-
-RSRC_FILE = "src/dockerui/app.xrc"
-RSRC_FRAMENAME = "mainFrame"
-
-BORDER_MAIN = 1
 
 client = docker.from_env()
 
 class DockerUI(wx.App):
-    view_list = False
-
     def OnInit(self):
         self.res = wx.xrc.XmlResource.Get()
         self.res.LoadFile(RSRC_FILE)
@@ -33,6 +27,9 @@ class DockerUI(wx.App):
         return True
     
     def render(self):
+        self.IS_DARK = wx.SystemSettings.GetAppearance().IsDark()
+        self.BACKGROUND_COLOR = wx.Colour(120, 120, 120) if self.IS_DARK else wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE)
+
         self.frame = self.res.LoadFrame(None, RSRC_FRAMENAME)
         self.SetTopWindow(self.frame)
         self.notebook = wx.xrc.XRCCTRL(self.frame, "mainNotebook")
@@ -51,10 +48,12 @@ class DockerUI(wx.App):
         self.frame.Bind(wx.EVT_SIZE, self.on_size)
         self.frame.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.changing_tab_action, self.notebook)
 
-        self.frame.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
-        self.notebook.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
-        self.containers_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-        self.images_panel.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
+        self.frame.SetBackgroundColour(self.BACKGROUND_COLOR)
+        self.notebook.SetBackgroundColour(self.BACKGROUND_COLOR)
+        self.containers_page.SetBackgroundColour(WHITE_BACKGROUND)
+        self.images_page.SetBackgroundColour(WHITE_BACKGROUND)
+        self.containers_panel.SetBackgroundColour(WHITE_BACKGROUND)
+        self.images_panel.SetBackgroundColour(WHITE_BACKGROUND)
 
     def menu(self):
         menu_bar  = wx.MenuBar()
@@ -171,7 +170,8 @@ class DockerUI(wx.App):
         print("getting images list")
         text = self.text_ctrl.GetValue()
         result = client.images.list()
-        result = list(filter(lambda i: i.tags[0].startswith(self.text_ctrl.GetValue()), result))
+        if not self.text_ctrl.GetValue() == "":
+            result = list(filter(lambda i: i.tags[0].startswith(self.text_ctrl.GetValue()), result))
         result = sorted(result, key=lambda i: i.tags[0])
         return result
 
