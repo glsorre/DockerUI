@@ -23,6 +23,9 @@ class Image(wx.Panel):
         _name = wx.StaticText(self)
         _name.SetFont(wx.Font(wx.FontInfo(14).Bold()))
         _name.SetLabel(self.image.tags[0])
+        _label = wx.StaticText(self)
+        _label.SetFont(wx.Font(wx.FontInfo(9)))
+        _label.SetLabel(str(self.image.labels))
         _description = wx.StaticText(self)
         _description.SetFont(wx.Font(wx.FontInfo(9)))
         _description.SetLabel(self.image.short_id)
@@ -78,6 +81,7 @@ class Image(wx.Panel):
 
         info_sizer.Add(_name, 0, wx.ALL|wx.EXPAND, border=BORDER_IMAGE)
         info_sizer.Add(_description, 0, wx.ALL|wx.EXPAND, border=BORDER_IMAGE)
+        info_sizer.Add(_label, 0, wx.ALL|wx.EXPAND, border=BORDER_IMAGE)
         #info_sizer.Add(_status, 0, wx.ALL|wx.EXPAND, border=BORDER_CONTAINER)
         
         # self.panel_sizer.Add(info_sizer, 1, wx.ALL, border=BORDER_CONTAINER)

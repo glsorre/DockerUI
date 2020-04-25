@@ -170,6 +170,7 @@ class DockerUI(wx.App):
         print("getting images list")
         text = self.text_ctrl.GetValue()
         result = client.images.list()
+        result = list(filter(lambda i: i.tags[0] != "", result))
         if not self.text_ctrl.GetValue() == "":
             result = list(filter(lambda i: i.tags[0].startswith(self.text_ctrl.GetValue()), result))
         result = sorted(result, key=lambda i: i.tags[0])
