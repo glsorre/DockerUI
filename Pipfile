@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 briefcase = "*"
+ipython = "*"
 
 [packages]
 wxpython = "*"

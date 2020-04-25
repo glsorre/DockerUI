@@ -22,7 +22,7 @@ class Image(wx.Panel):
 
         _name = wx.StaticText(self)
         _name.SetFont(wx.Font(wx.FontInfo(14).Bold()))
-        _name.SetLabel(self.image.attrs["RepoTags"][0])
+        _name.SetLabel(self.image.tags[0])
         _description = wx.StaticText(self)
         _description.SetFont(wx.Font(wx.FontInfo(9)))
         _description.SetLabel(self.image.short_id)
